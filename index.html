@@ -74,9 +74,16 @@
   .hl-top .n{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:700}
   .hl-sub{font-size:11px;color:var(--mut);margin-top:2px}
 
+  /* download button */
+  .dl{display:inline-flex;align-items:center;gap:7px;margin-top:11px;border:1.5px solid var(--teal);
+    background:var(--card);color:var(--teal);border-radius:999px;padding:8px 15px;font-size:12.5px;
+    font-weight:600;text-decoration:none;transition:all .12s ease}
+  .dl:hover{background:var(--teal);color:#fff}
+  .dl .dl-n{font-size:10.5px;font-weight:500;opacity:.75}
+
   /* metric tiles */
-  .tiles{display:flex;gap:8px;margin-top:11px}
-  .tile{flex:1;background:var(--paper);border-radius:8px;padding:8px 6px;text-align:center}
+  .tiles{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
+  .tile{flex:1;min-width:88px;background:var(--paper);border-radius:8px;padding:8px 6px;text-align:center}
   .tile .tl{font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);font-weight:600}
   .tile .tv{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;margin-top:2px}
 
@@ -117,7 +124,8 @@
   <header>
     <div class="eyebrow">Ocean Keyes · North Myrtle Beach</div>
     <h1>Investment Explorer</h1>
-    <p>Tap a scenario to load it, then fine-tune with the sliders. Everything below — year-one cash flow, the 5-year projection, and your profit at sale — recomputes the moment you touch anything.</p>
+    <p>Tap a scenario to load it, then fine-tune with the sliders. Everything below — year-one cash flow, the 5-year projection, and your profit at sale — recomputes the moment you touch anything. The defaults are the buy-side spreadsheet model, line for line.</p>
+    <a class="dl" href="ocean-keyes-buyside-model.xlsx" download>⬇ Download the spreadsheet model <span class="dl-n">.xlsx · Excel, Numbers, Sheets</span></a>
   </header>
 
   <!-- PRESETS -->
@@ -147,13 +155,28 @@
 
   <!-- SLIDERS -->
   <div class="card">
-    <div class="lab">Fine-tune the assumptions</div>
-    <div class="sgrid" id="sliders"></div>
+    <div class="lab">Purchase &amp; financing</div>
+    <div class="sgrid" id="sliders-buy"></div>
+  </div>
+
+  <div class="card">
+    <div class="lab">How much you rent it</div>
+    <div class="sgrid" id="sliders-rent"></div>
+  </div>
+
+  <div class="card">
+    <div class="lab">Operating costs · annual unless noted</div>
+    <div class="sgrid" id="sliders-op"></div>
+  </div>
+
+  <div class="card">
+    <div class="lab">Growth &amp; exit</div>
+    <div class="sgrid" id="sliders-exit"></div>
   </div>
 
   <!-- YEAR ONE -->
   <div class="card">
-    <div class="lab">Year one · <span id="unit-name">3 Bed</span> · <span id="fin-name">20% down</span></div>
+    <div class="lab">Year one · <span id="unit-name">2 Bed</span> · <span id="fin-name">25% down</span></div>
     <div id="y1"></div>
   </div>
 
@@ -211,8 +234,10 @@
       <li><b>Property tax nearly doubles at closing</b> — the listing's figure is usually the prior owner's 4% primary rate; you pay the 6% second-home ratio.</li>
       <li><b>Self-managing from New Jersey</b> means a local cleaning/turnover crew and someone for guest issues, plus running pricing, listings, and the ~13% accommodations-tax filings yourself.</li>
       <li><b>Defaults are grounded estimates,</b> not quotes. Confirm exact HOA dues from the resale certificate and get a real STR insurance quote before trusting the bottom line.</li>
+      <li><b>This page and the spreadsheet are the same model.</b> The 2BR base case here ties out to the spreadsheet's Base column: $26,000 gross, the same eleven expense lines, the same 25% / 7.25% / 30-yr financing, and cash invested that includes furnishing. The Light and Max presets don't map onto the spreadsheet's Conservative and Optimistic columns — the week presets imply a wider revenue spread than that band.</li>
+      <li><b>The two files disagree on one number.</b> The spreadsheet carries property tax as a flat $3,000; this page previously derived it from a 0.28 millage, which on a $300k unit gives ~$5,040. Both cite Horry County. The spreadsheet's figure is the default here, and tax is now a slider — run your actual unit on the county estimator and set it yourself.</li>
     </ul>
-    <div class="foot">Not financial advice — a planning tool. Market inputs drawn from AirDNA/AirROI rental data, Coastal Carolinas MLS sold comps, Horry County tax rules, and Aug 2026 mortgage rates. The two numbers that move the result most are your real occupancy and your financing.</div>
+    <div class="foot">Not financial advice — a planning tool. Market inputs drawn from AirDNA/AirROI rental data, Coastal Carolinas MLS sold comps, Horry County tax rules, and Aug 2026 mortgage rates. The two numbers that move the result most are your real occupancy and your financing. Accommodations taxes are collected from the guest and remitted — a pass-through, so they're excluded from this owner P&L.</div>
   </div>
 
 </div>
@@ -221,9 +246,10 @@
 // ─────────────────────────────────────────────────────────────
 //  STATE
 // ─────────────────────────────────────────────────────────────
+// Defaults mirror the buy-side spreadsheet model (2BR/2BA base case).
 const UNITS = {
-  '2br': {name:'2 Bed', price:330000, hoa:425, pkR:1650, shR:1050, offR:650, pMin:290000, pMax:380000},
-  '3br': {name:'3 Bed', price:410000, hoa:475, pkR:2100, shR:1300, offR:750, pMin:330000, pMax:480000},
+  '2br': {name:'2 Bed', price:300000, hoa:550, tax:3000, pkR:1700, shR:1150, offR:700, pMin:250000, pMax:380000},
+  '3br': {name:'3 Bed', price:410000, hoa:615, tax:4100, pkR:2100, shR:1300, offR:750, pMin:330000, pMax:480000},
 };
 const OP = {
   light:{name:'Light',  pkW:8,  shW:3,  offW:1},
@@ -232,15 +258,17 @@ const OP = {
 };
 
 let S = {
-  unit:'3br',
-  price:410000, hoa:475,
-  pkW:10, pkR:2100, shW:6, shR:1300, offW:3, offR:750,
-  dpPct:20, rate:7.25, term:30, millage:0.28,
-  platformPct:4, insurance:1500, maint:1400, utilities:1500, closingPct:3,
+  unit:'2br',
+  price:300000, hoa:550, tax:3000,
+  pkW:10, pkR:1700, shW:6, shR:1150, offW:3, offR:700,
+  dpPct:25, rate:7.25, term:30,
+  insurance:1100, electric:1800, cleaning:1200, supplies:1000, permit:500, reserve:1200,
+  platformPct:3, maintPct:6,
+  closingPct:3, furnish:5000,
   appr:3, rentGrowth:3, expGrowth:3, hold:5, sellPct:7,
 };
 // active preset tracking
-let active = {unit:'3br', fin:'20', op:'base', appr:'3', story:null};
+let active = {unit:'2br', fin:'25', op:'base', appr:'3', story:null};
 
 // ─────────────────────────────────────────────────────────────
 //  HELPERS
@@ -269,18 +297,25 @@ function model(){
   const debtY = monthly*12;
   const r = S.rate/100/12;
 
-  const taxY1 = S.price*0.06*S.millage;
+  const taxY1 = S.tax;
   const hoaY1 = S.hoa*12;
   const platY1 = grossY1*(S.platformPct/100);
-  const fixedOpexY1 = taxY1+hoaY1+S.insurance+S.maint+S.utilities; // scales with expGrowth
-  const opexY1 = fixedOpexY1+platY1;
+  const maintY1 = grossY1*(S.maintPct/100);
+  // fixed lines scale with expGrowth; platform + R&M ride on gross
+  const fixedOpexY1 = taxY1+hoaY1+S.insurance+S.electric+S.cleaning+S.supplies+S.permit+S.reserve;
+  const opexY1 = fixedOpexY1+platY1+maintY1;
   const noiY1 = grossY1-opexY1;
   const cfY1 = noiY1-debtY;
 
   const closing = S.price*(S.closingPct/100);
-  const invested = down+closing;
-  const capY1 = noiY1/S.price*100;
+  const allIn = S.price+closing+S.furnish;
+  const invested = down+closing+S.furnish;
+  const capY1 = noiY1/allIn*100;
   const cocY1 = invested>0 ? cfY1/invested*100 : 0;
+  const dscr = debtY>0 ? noiY1/debtY : null;
+  const varPct = (S.platformPct+S.maintPct)/100;
+  const breakeven = varPct<1 ? (fixedOpexY1+debtY)/(1-varPct) : 0;
+  const mgmtAvoided = grossY1*0.2;
 
   // year-by-year
   let bal = loan, cum = 0;
@@ -289,7 +324,7 @@ function model(){
     // amortize 12 months
     let interestYr=0, principalYr=0;
     for(let mo=0;mo<12;mo++){
-      const interest = bal*r;
+      let interest = bal*r;
       let principal = monthly-interest;
       if(S.dpPct>=100){interest=0;principal=0;}
       interestYr+=interest; principalYr+=principal;
@@ -299,7 +334,8 @@ function model(){
     const gross = grossY1*Math.pow(1+S.rentGrowth/100,y-1);
     const fixedOpex = fixedOpexY1*Math.pow(1+S.expGrowth/100,y-1);
     const plat = gross*(S.platformPct/100);
-    const noi = gross-fixedOpex-plat;
+    const maint = gross*(S.maintPct/100);
+    const noi = gross-fixedOpex-plat-maint;
     const cf = noi-(S.dpPct>=100?0:debtY);
     cum+=cf;
     years.push({y, value, loan:bal, equity:value-bal, gross, noi, cf, cum});
@@ -317,30 +353,48 @@ function model(){
   const roi = invested>0 ? totalProfit/invested*100 : 0;
   const annROI = invested>0 ? (Math.pow(1+totalProfit/invested,1/S.hold)-1)*100 : 0;
 
-  return {grossY1,weeks,occ,down,loan,monthly,debtY,taxY1,hoaY1,platY1,opexY1,noiY1,cfY1,
-    closing,invested,capY1,cocY1,years,salePrice,sellingCosts,loanPayoff,netProceeds,
+  return {grossY1,weeks,occ,down,loan,monthly,debtY,taxY1,hoaY1,platY1,maintY1,opexY1,noiY1,cfY1,
+    closing,allIn,invested,capY1,cocY1,dscr,breakeven,mgmtAvoided,
+    years,salePrice,sellingCosts,loanPayoff,netProceeds,
     appreciationGain,principalPaid,cumCF,totalProfit,roi,annROI};
 }
 
 // ─────────────────────────────────────────────────────────────
 //  SLIDER DEFINITIONS
 // ─────────────────────────────────────────────────────────────
+// g = which card the slider renders into. Every input the spreadsheet exposes is here.
 const SLIDERS = [
-  {k:'price', label:'Purchase price', min:()=>UNITS[S.unit].pMin, max:()=>UNITS[S.unit].pMax, step:5000, unit:'$'},
-  {k:'hoa', label:'HOA dues (monthly)', min:300, max:700, step:25, unit:'$', hint:'Incl. water, sewer, trash, cable, internet'},
-  {k:'dpPct', label:'Down payment', min:10, max:100, step:5, unit:'%', hint:'100% = all cash'},
-  {k:'rate', label:'Interest rate', min:5, max:9, step:0.05, unit:'%', hint:'Second-home 30-yr ≈ 7.0–7.5% (Aug 2026)'},
-  {k:'pkW', label:'Peak weeks rented', min:0, max:13, step:1, unit:' wk', hint:'Mid-Jun → mid-Aug'},
-  {k:'pkR', label:'Peak $/week', min:400, max:3000, step:50, unit:'$'},
-  {k:'shW', label:'Shoulder weeks', min:0, max:16, step:1, unit:' wk', hint:'May, Sep, holidays'},
-  {k:'shR', label:'Shoulder $/week', min:400, max:2500, step:50, unit:'$'},
-  {k:'offW', label:'Off-season weeks', min:0, max:23, step:1, unit:' wk', hint:'Nov→Mar, Apr, Oct'},
-  {k:'offR', label:'Off-season $/week', min:300, max:1800, step:25, unit:'$'},
-  {k:'appr', label:'Appreciation / yr', min:-4, max:7, step:0.5, unit:'%'},
-  {k:'hold', label:'Hold period', min:1, max:15, step:1, unit:' yr'},
-  {k:'sellPct', label:'Selling costs', min:5, max:9, step:0.5, unit:'%', hint:'Commission + closing'},
-  {k:'rentGrowth', label:'Rent growth / yr', min:0, max:6, step:0.5, unit:'%'},
+  {g:'buy', k:'price', label:'Purchase price', min:()=>UNITS[S.unit].pMin, max:()=>UNITS[S.unit].pMax, step:5000, unit:'$'},
+  {g:'buy', k:'dpPct', label:'Down payment', min:10, max:100, step:5, unit:'%', hint:'100% = all cash'},
+  {g:'buy', k:'rate', label:'Interest rate', min:5, max:9, step:0.05, unit:'%', hint:'Investment condo ≈ 7.0–7.5% (Aug 2026)'},
+  {g:'buy', k:'closingPct', label:'Closing costs', min:1, max:6, step:0.5, unit:'%'},
+  {g:'buy', k:'furnish', label:'Furnishing / turnkey setup', min:0, max:20000, step:500, unit:'$'},
+
+  {g:'rent', k:'pkW', label:'Peak weeks rented', min:0, max:13, step:1, unit:' wk', hint:'Mid-Jun → mid-Aug'},
+  {g:'rent', k:'pkR', label:'Peak $/week', min:400, max:3000, step:50, unit:'$'},
+  {g:'rent', k:'shW', label:'Shoulder weeks', min:0, max:16, step:1, unit:' wk', hint:'May, Sep, holidays'},
+  {g:'rent', k:'shR', label:'Shoulder $/week', min:400, max:2500, step:50, unit:'$'},
+  {g:'rent', k:'offW', label:'Off-season weeks', min:0, max:23, step:1, unit:' wk', hint:'Nov→Mar, Apr, Oct'},
+  {g:'rent', k:'offR', label:'Off-season $/week', min:300, max:1800, step:25, unit:'$'},
+
+  {g:'op', k:'hoa', label:'HOA / regime fee (monthly)', min:300, max:900, step:25, unit:'$', hint:'Incl. water, sewer, trash, wifi, cable — verify with the POA'},
+  {g:'op', k:'tax', label:'Property tax (2nd home)', min:1000, max:9000, step:100, unit:'$', hint:'Horry County 6% ratio — run your unit on the county estimator'},
+  {g:'op', k:'insurance', label:'STR insurance', min:500, max:4000, step:100, unit:'$', hint:'HO-6 + rider'},
+  {g:'op', k:'electric', label:'Electric (owner-paid)', min:0, max:4000, step:100, unit:'$'},
+  {g:'op', k:'cleaning', label:'Cleaning slippage', min:0, max:4000, step:100, unit:'$', hint:'Net of guest cleaning fees'},
+  {g:'op', k:'supplies', label:'Supplies & consumables', min:0, max:3000, step:100, unit:'$'},
+  {g:'op', k:'permit', label:'STR permit / license / agent', min:0, max:2000, step:50, unit:'$'},
+  {g:'op', k:'reserve', label:'Capital reserve', min:0, max:4000, step:100, unit:'$', hint:'Furniture replacement'},
+  {g:'op', k:'platformPct', label:'Platform / booking fee', min:0, max:8, step:0.5, unit:'%', hint:'% of gross rental'},
+  {g:'op', k:'maintPct', label:'Repairs & maintenance', min:0, max:12, step:0.5, unit:'%', hint:'% of gross rental'},
+
+  {g:'exit', k:'appr', label:'Appreciation / yr', min:-4, max:7, step:0.5, unit:'%'},
+  {g:'exit', k:'rentGrowth', label:'Rent growth / yr', min:0, max:6, step:0.5, unit:'%'},
+  {g:'exit', k:'expGrowth', label:'Expense growth / yr', min:0, max:6, step:0.5, unit:'%'},
+  {g:'exit', k:'hold', label:'Hold period', min:1, max:15, step:1, unit:' yr'},
+  {g:'exit', k:'sellPct', label:'Selling costs', min:5, max:9, step:0.5, unit:'%', hint:'Commission + closing'},
 ];
+const SLIDER_GROUPS = ['buy','rent','op','exit'];
 
 // ─────────────────────────────────────────────────────────────
 //  RENDER
@@ -375,19 +429,21 @@ function renderPresets(){
 }
 
 function renderSliders(){
-  const box=document.getElementById('sliders'); box.innerHTML='';
-  SLIDERS.forEach(sl=>{
-    const min=typeof sl.min==='function'?sl.min():sl.min;
-    const max=typeof sl.max==='function'?sl.max():sl.max;
-    const val=S[sl.k];
-    const disp = sl.unit==='$'?fmt(val):(val+sl.unit);
-    const d=document.createElement('div'); d.className='fld';
-    d.innerHTML=`<div class="fld-top"><label>${sl.label}</label><span class="v">${disp}</span></div>
-      <input type="range" min="${min}" max="${max}" step="${sl.step}" value="${val}">
-      ${sl.hint?`<div class="hint">${sl.hint}</div>`:''}`;
-    const inp=d.querySelector('input');
-    inp.oninput=e=>{ S[sl.k]=parseFloat(e.target.value); active.story=null; renderAll(); };
-    box.appendChild(d);
+  SLIDER_GROUPS.forEach(g=>{
+    const box=document.getElementById('sliders-'+g); box.innerHTML='';
+    SLIDERS.filter(sl=>sl.g===g).forEach(sl=>{
+      const min=typeof sl.min==='function'?sl.min():sl.min;
+      const max=typeof sl.max==='function'?sl.max():sl.max;
+      const val=S[sl.k];
+      const disp = sl.unit==='$'?fmt(val):(val+sl.unit);
+      const d=document.createElement('div'); d.className='fld';
+      d.innerHTML=`<div class="fld-top"><label>${sl.label}</label><span class="v">${disp}</span></div>
+        <input type="range" min="${min}" max="${max}" step="${sl.step}" value="${val}">
+        ${sl.hint?`<div class="hint">${sl.hint}</div>`:''}`;
+      const inp=d.querySelector('input');
+      inp.oninput=e=>{ S[sl.k]=parseFloat(e.target.value); active.story=null; renderAll(); };
+      box.appendChild(d);
+    });
   });
 }
 
@@ -403,26 +459,34 @@ function renderY1(m){
   h+=`<div style="display:flex;justify-content:space-between;padding:6px 10px;background:#e9f0ee;border-radius:7px;margin-bottom:8px">
     <span style="font-size:11.5px;font-weight:700">${m.weeks} wks rented · ${m.occ.toFixed(0)}% occupancy</span>
     <span class="mono" style="font-size:14px;font-weight:700;color:var(--sea)">${fmt(m.grossY1)}</span></div>`;
-  h+=rowHTML('Gross rental', fmt(m.grossY1), {color:'var(--sea)',strong:true});
-  h+=rowHTML('Property tax', '-'+fmt(m.taxY1), {color:'var(--coral)',indent:true,note:'6%'});
-  h+=rowHTML('HOA dues', '-'+fmt(m.hoaY1), {color:'var(--coral)',indent:true});
-  h+=rowHTML('Insurance (STR)', '-'+fmt(S.insurance), {color:'var(--coral)',indent:true});
-  h+=rowHTML('Maintenance / reserve', '-'+fmt(S.maint), {color:'var(--coral)',indent:true});
-  h+=rowHTML('Utilities', '-'+fmt(S.utilities), {color:'var(--coral)',indent:true});
-  h+=rowHTML('Platform / booking', '-'+fmt(m.platY1), {color:'var(--coral)',indent:true,note:S.platformPct+'%'});
+  h+=rowHTML('Gross rental revenue', fmt(m.grossY1), {color:'var(--sea)',strong:true});
+  h+=rowHTML('Platform / booking fees', '-'+fmt(m.platY1), {color:'var(--coral)',indent:true,note:S.platformPct+'% of gross'});
+  h+=rowHTML('Repairs & maintenance', '-'+fmt(m.maintY1), {color:'var(--coral)',indent:true,note:S.maintPct+'% of gross'});
+  h+=rowHTML('HOA / regime fee', '-'+fmt(m.hoaY1), {color:'var(--coral)',indent:true});
+  h+=rowHTML('Property tax', '-'+fmt(m.taxY1), {color:'var(--coral)',indent:true,note:'2nd home'});
+  h+=rowHTML('STR insurance', '-'+fmt(S.insurance), {color:'var(--coral)',indent:true});
+  h+=rowHTML('Electric', '-'+fmt(S.electric), {color:'var(--coral)',indent:true});
+  h+=rowHTML('Cleaning slippage', '-'+fmt(S.cleaning), {color:'var(--coral)',indent:true});
+  h+=rowHTML('Supplies & consumables', '-'+fmt(S.supplies), {color:'var(--coral)',indent:true});
+  h+=rowHTML('STR permit / license / agent', '-'+fmt(S.permit), {color:'var(--coral)',indent:true});
+  h+=rowHTML('Capital reserve', '-'+fmt(S.reserve), {color:'var(--coral)',indent:true});
   h+=rowHTML('Net operating income', fmt(m.noiY1), {color:m.noiY1>=0?'var(--sea)':'var(--coral)',strong:true});
   if(S.dpPct<100) h+=rowHTML('Mortgage P&I', '-'+fmt(m.debtY), {color:'var(--coral)',indent:true,note:fmt(m.monthly)+'/mo'});
 
   h+=`<div class="hl ${m.cfY1>=0?'pos':'neg'}">
     <div class="hl-top"><span class="t">Year-one cash flow</span>
     <span class="n" style="color:${m.cfY1>=0?'var(--sea)':'var(--coral)'}">${fmt(m.cfY1)}</span></div>
-    <div class="hl-sub">${fmt(m.cfY1/12)} / month · ${fmt(m.invested)} cash to close</div></div>`;
+    <div class="hl-sub">${fmt(m.cfY1/12)} / month · ${fmt(m.invested)} cash invested (down + closing + furnishing)</div></div>`;
 
   h+=`<div class="tiles">
     <div class="tile"><div class="tl">Cap rate</div><div class="tv" style="color:${m.capY1>=0?'var(--sea)':'var(--coral)'}">${pct(m.capY1)}</div></div>
     <div class="tile"><div class="tl">Cash-on-cash</div><div class="tv" style="color:${m.cocY1>=0?'var(--sea)':'var(--coral)'}">${pct(m.cocY1)}</div></div>
-    <div class="tile"><div class="tl">Cash to close</div><div class="tv">${fmtk(m.invested)}</div></div>
+    <div class="tile"><div class="tl">DSCR</div><div class="tv" style="color:${m.dscr===null?'var(--ink)':(m.dscr>=1?'var(--sea)':'var(--coral)')}">${m.dscr===null?'—':m.dscr.toFixed(2)}</div></div>
+    <div class="tile"><div class="tl">Break-even rent</div><div class="tv" style="color:${m.grossY1>=m.breakeven?'var(--sea)':'var(--coral)'}">${fmtk(m.breakeven)}</div></div>
+    <div class="tile"><div class="tl">Cash invested</div><div class="tv">${fmtk(m.invested)}</div></div>
   </div>`;
+  h+=`<div class="foot" style="margin-top:9px">Break-even is the gross rent that would put cash flow at zero — you're modelling ${fmt(m.grossY1)}.
+    Self-managing avoids roughly ${fmt(m.mgmtAvoided)}/yr in management fees (~20% of gross); hand it to a manager and cash flow drops by about that much.</div>`;
   document.getElementById('y1').innerHTML=h;
 }
 
@@ -542,8 +606,13 @@ function renderBreakdownChart(m){
     const bx=val>=0?zero:zero-w;
     g+=`<text x="${pl-8}" y="${cy+4}" text-anchor="end" font-size="11" fill="#3a4a45" font-family="Inter">${lbl}</text>`;
     g+=`<rect x="${bx}" y="${cy-7}" width="${Math.max(w,1)}" height="15" rx="3" fill="${col}" opacity="${lbl==='Net profit'?1:0.85}"/>`;
-    const tx=val>=0?zero+w+5:zero-w-5;
-    g+=`<text x="${tx}" y="${cy+4}" text-anchor="${val>=0?'start':'end'}" font-size="10.5" fill="${col}" font-family="IBM Plex Mono" font-weight="600">${fmtk(val)}</text>`;
+    // park the number outside the bar, but flip it inside when it would run
+    // into the row label (left) or off the plot (right)
+    const txt=fmtk(val), tw=txt.length*6.2;
+    let tx=val>=0?zero+w+5:zero-w-5, anchor=val>=0?'start':'end', tcol=col;
+    if(val<0 && tx-tw<pl){ tx=zero-w+6; anchor='start'; tcol='#fff'; }
+    if(val>=0 && tx+tw>W-pr){ tx=zero+w-6; anchor='end'; tcol='#fff'; }
+    g+=`<text x="${tx}" y="${cy+4}" text-anchor="${anchor}" font-size="10.5" fill="${tcol}" font-family="IBM Plex Mono" font-weight="600">${txt}</text>`;
   });
   document.getElementById('chart-breakdown').innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${g}</svg>`;
 }
@@ -552,7 +621,7 @@ function renderBreakdownChart(m){
 //  PRESET ACTIONS
 // ─────────────────────────────────────────────────────────────
 function applyUnit(k){
-  const u=UNITS[k]; S.unit=k; S.price=u.price; S.hoa=u.hoa;
+  const u=UNITS[k]; S.unit=k; S.price=u.price; S.hoa=u.hoa; S.tax=u.tax;
   S.pkR=u.pkR; S.shR=u.shR; S.offR=u.offR; active.unit=k;
 }
 function applyOp(k){ const o=OP[k]; S.pkW=o.pkW; S.shW=o.shW; S.offW=o.offW; active.op=k; }
@@ -563,6 +632,7 @@ function setOp(k){ applyOp(k); active.story=null; renderAll(); }
 function setAppr(k){ S.appr=parseInt(k); active.appr=k; active.story=null; renderAll(); }
 
 const STORIES=[
+  {name:'📊 Spreadsheet base case', apply:()=>{applyUnit('2br');S.dpPct=25;applyOp('base');S.appr=3;active.fin='25';active.appr='3';}},
   {name:'🏖 Lifestyle buyer', apply:()=>{applyUnit('3br');S.dpPct=20;applyOp('light');S.appr=3;active.fin='20';active.appr='3';}},
   {name:'💰 Cash investor, max rental', apply:()=>{applyUnit('3br');S.dpPct=100;applyOp('max');S.appr=3;active.fin='100';active.appr='3';}},
   {name:'📈 Leveraged bet', apply:()=>{applyUnit('3br');S.dpPct=10;applyOp('base');S.appr=5;active.fin='10';active.appr='5';}},
