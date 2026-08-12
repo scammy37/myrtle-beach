@@ -2,7 +2,7 @@
 
 An interactive tool for evaluating a condo purchase at **Ocean Keyes, North Myrtle Beach** as a self-managed short-term rental. Tap a scenario, fine-tune the sliders, and watch year-one cash flow, a multi-year projection, and profit-at-sale recompute live.
 
-**Live site:** once GitHub Pages is enabled → `https://<your-username>.github.io/ocean-keyes-explorer/`
+**Live site:** once GitHub Pages is enabled → <https://scammy37.github.io/myrtle-beach/>
 
 ## What it does
 
@@ -11,6 +11,16 @@ An interactive tool for evaluating a condo purchase at **Ocean Keyes, North Myrt
 - **Multi-year projection** — property value, loan balance, equity, and cumulative cash flow across an adjustable hold period.
 - **Profit at sale** — appreciation + loan paydown + cumulative cash flow − selling costs, with annualized return.
 - **Self-contained SVG charts** — equity build-up, cumulative cash flow, and a total-return breakdown. No external libraries; works offline.
+
+## Spreadsheet model
+
+`ocean-keyes-buyside-model.xlsx` is the underlying buy-side model in spreadsheet form — a 2BR/2BA, self-managed short-term-rental underwrite you can edit in Excel, Numbers, or Google Sheets.
+
+- **Buy-Side Model** sheet — purchase & financing (price, down payment, rate, term, P&I), total cash invested (closing costs + furnishing), annual operating assumptions (HOA, second-home property tax, STR insurance, electric, cleaning slippage, supplies, permit, capital reserve, booking-fee and R&M percentages), and a three-column pro forma (Conservative / Base / Optimistic) running gross revenue → operating expenses → NOI → debt service → pre-tax cash flow.
+- **Return metrics** — cap rate, cash-on-cash, DSCR, break-even gross revenue, plus a memo line for the management fee avoided by self-managing.
+- **Notes & Sources** sheet — assumptions, the two must-verify inputs (exact HOA/regime fee and the Horry County tax estimate at the 6% second-home ratio), the accommodations-tax pass-through treatment, what the model excludes (appreciation, principal paydown, tax effects, special assessments), and source list.
+
+Cells are color-coded: blue = your inputs, yellow = verify before relying on it, black = calculated. Every figure is a live formula, so changing an input recomputes the scenarios.
 
 ## Data sources
 
