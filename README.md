@@ -2,7 +2,7 @@
 
 An interactive tool for evaluating a condo purchase at **Ocean Keyes, North Myrtle Beach** as a self-managed short-term rental. Tap a scenario, fine-tune the sliders, and watch year-one cash flow, a multi-year projection, and profit-at-sale recompute live.
 
-**Live site:** once GitHub Pages is enabled → `https://<your-username>.github.io/ocean-keyes-explorer/`
+**Live site:** once GitHub Pages is enabled → <https://scammy37.github.io/myrtle-beach/>
 
 ## What it does
 
